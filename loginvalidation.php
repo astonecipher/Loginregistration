@@ -1,5 +1,5 @@
 <?php
-
+// use a config file for env variables. 
 // Connect to the database
 $conn = mysqli_connect('localhost', 'root', 'junior@2013', 'norushzone');
 
@@ -8,11 +8,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// these variables already exist and are not needed
 // Get the form data
-$username = $_POST['username'];
-$email = $_POST['email'];
-$password = $_POST['password'];
-$confirm_password = $_POST['confirm_password'];
+// $username = $_POST['username'];
+// $email = $_POST['email'];
+// $password = $_POST['password'];
+// $confirm_password = $_POST['confirm_password'];
 
 // Validate the form data
 if (empty($username)) {
@@ -23,11 +24,13 @@ if (empty($username)) {
     $error_message = 'Passwords do not match';
 } else if (empty($email)) {
     $error_message = 'Email is required';
-} else {
+} else { 
     // Insert the form data into the database
-    $sql = "INSERT INTO userregistration (`username`, `email`, `password`, `confirmpassword`) VALUES ('$username', '$email', '$password', '$confirm_password')";
-    $result = mysqli_query($conn, $sql);
-    if ($result === true) {
+    $sql = "INSERT INTO userregistration (`username`, `email`, `password`) VALUES (?,?,?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssss", $_POST['username'], $_POST['email'], $_POST['password']);
+    
+    if ($stmt->execute()) {
         // query was successful
         echo "Registration successful!";
     } else {
